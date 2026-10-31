@@ -11,6 +11,7 @@
   <script>window.APP_CONFIG = { eventYear: 2026, eventName: "MSB Backup 2026", defaultRegion: "local" }; window.PUBLIC_SCOREBOARD_MODE = true;</script>
 
   <script src="./assets/msb_formal_config.js"></script>
+  <script src="./assets/msb_break_flow.js"></script>
   <script src="./assets/tailwind.runtime.js"></script>
   <script src="./assets/lucide.min.js"></script>
 
@@ -113,6 +114,18 @@
         .balls-row { gap: .3rem; padding: .35rem; }
         .ball { width: 22px; height: 22px; }
       }
+    }
+    /* Break, penalty and tie-break modals: readable from the side of the court, sized by the viewport. */
+    .big-modal-panel { padding: clamp(1.25rem, 4vmin, 2.5rem); }
+    .big-modal-title { font-size: clamp(2.25rem, 6.5vmin, 3.5rem); line-height: 1.1; }
+    .big-modal-info { font-size: clamp(1.5rem, 4.2vmin, 2.1rem); line-height: 1.25; font-weight: 700; }
+    .big-modal-clock { display: block; font-size: clamp(7rem, 26vmin, 18rem); line-height: 1; margin: 0.25rem 0 clamp(0.75rem, 3vmin, 1.5rem); }
+    /* "01:00" is about 3.2em wide in the mono font: cap it to the panel's inner width. */
+    .big-modal-clock-wide { font-size: min(clamp(7rem, 26vmin, 18rem), calc((min(100vw - 2rem, 48rem) - 5rem) / 3.2)); }
+    .big-modal-btn { font-size: 1.5rem; line-height: 1.2; padding: 1.25rem 0.75rem; min-height: 4.5rem; }
+    @media (max-height: 560px) {
+      .big-modal-clock { font-size: clamp(5rem, 24vmin, 18rem); }
+      .big-modal-btn { padding: 0.9rem 0.75rem; min-height: 3.75rem; }
     }
   </style>
 </head>
@@ -468,37 +481,37 @@
   </div>
 
   <div id="penalty-modal" class="hidden fixed inset-0 z-[80] bg-black/95 flex items-center justify-center p-4 modal-safe">
-    <div class="bg-slate-900 border border-slate-700 rounded-2xl p-6 w-full max-w-sm text-center">
-      <div class="tracking-widest text-slate-400 font-bold mb-2">罰球</div>
-      <h2 id="penalty-title" class="text-2xl font-black mb-2">罰球</h2>
-      <p id="penalty-info" class="text-slate-400 mb-4"></p>
-      <button onclick="togglePenaltyTimer()" id="penalty-clock" class="text-7xl font-mono font-black mb-6 w-full">01:00</button>
-      <div class="grid grid-cols-2 gap-2">
-        <button onclick="penaltyScore()" class="bg-emerald-600 rounded-xl py-3 font-black">投進得分 (+1)</button>
-        <button onclick="nextPenaltyShot()" class="bg-slate-700 rounded-xl py-3 font-black">未得分 / 下一球</button>
+    <div class="big-modal-panel bg-slate-900 border border-slate-700 rounded-3xl w-full max-w-3xl text-center">
+      <div class="tracking-widest text-slate-400 font-bold text-xl mb-2">罰球</div>
+      <h2 id="penalty-title" class="big-modal-title font-black mb-2">罰球</h2>
+      <p id="penalty-info" class="big-modal-info text-slate-300 mb-2"></p>
+      <button onclick="togglePenaltyTimer()" id="penalty-clock" class="big-modal-clock big-modal-clock-wide font-mono font-black w-full">01:00</button>
+      <div class="grid grid-cols-2 gap-4">
+        <button onclick="penaltyScore()" class="big-modal-btn bg-emerald-600 rounded-2xl font-black">投進得分 (+1)</button>
+        <button onclick="nextPenaltyShot()" class="big-modal-btn bg-slate-700 rounded-2xl font-black">未得分 / 下一球</button>
       </div>
     </div>
   </div>
 
   <div id="tie-modal" class="hidden fixed inset-0 z-[90] bg-black/95 flex items-center justify-center p-4 modal-safe">
-    <div class="bg-slate-900 border border-slate-700 rounded-2xl p-6 w-full max-w-sm text-center">
-      <h2 class="text-2xl font-black mb-3">Tie-break</h2>
-      <p class="text-slate-400 mb-5">請選擇 tie-break 發球方</p>
-      <div class="grid grid-cols-2 gap-3">
-        <button onclick="startTieBreak('red')" class="bg-red-700 rounded-xl py-4 font-black">紅方</button>
-        <button onclick="startTieBreak('blue')" class="bg-sky-700 rounded-xl py-4 font-black">藍方</button>
+    <div class="big-modal-panel bg-slate-900 border border-slate-700 rounded-3xl w-full max-w-3xl text-center">
+      <h2 class="big-modal-title font-black mb-3">Tie-break</h2>
+      <p class="big-modal-info text-slate-300 mb-6">請選擇 tie-break 發球方</p>
+      <div class="grid grid-cols-2 gap-4">
+        <button onclick="startTieBreak('red')" class="big-modal-btn bg-red-700 rounded-2xl font-black">紅方</button>
+        <button onclick="startTieBreak('blue')" class="big-modal-btn bg-sky-700 rounded-2xl font-black">藍方</button>
       </div>
     </div>
   </div>
 
   <div id="break-modal" class="hidden fixed inset-0 z-[85] bg-black/95 flex items-center justify-center p-4 modal-safe">
-    <div class="bg-slate-900 border border-amber-700 rounded-2xl p-6 w-full max-w-sm text-center">
-      <h2 class="text-2xl font-black text-amber-300 mb-2">局間休息</h2>
-      <p id="break-info" class="text-slate-300 mb-4">準備下一局</p>
-      <div id="break-clock" class="text-7xl font-mono font-black text-white mb-5">60</div>
-      <div class="grid grid-cols-2 gap-2">
-        <button onclick="startBreakCountdown()" id="break-start-btn" class="touch-btn bg-amber-700 rounded-xl py-3 font-black">倒數</button>
-        <button onclick="finishBreak()" class="touch-btn bg-slate-700 rounded-xl py-3 font-black">開始下一局</button>
+    <div class="big-modal-panel bg-slate-900 border border-amber-700 rounded-3xl w-full max-w-3xl text-center">
+      <h2 class="big-modal-title font-black text-amber-300 mb-2">局間休息</h2>
+      <p id="break-info" class="big-modal-info text-slate-200 mb-2">準備下一局</p>
+      <div id="break-clock" class="big-modal-clock font-mono font-black text-white">60</div>
+      <div class="grid grid-cols-2 gap-4">
+        <button onclick="startBreakCountdown()" id="break-start-btn" class="big-modal-btn touch-btn bg-amber-700 rounded-2xl font-black">倒數</button>
+        <button onclick="finishBreak()" class="big-modal-btn touch-btn bg-slate-700 rounded-2xl font-black">開始下一局</button>
       </div>
     </div>
   </div>
@@ -565,6 +578,7 @@
     let breakTimer = null;
     let breakTimeLeft = 60;
     let pendingNextEnd = null;
+    let pendingTieBreak = null;
     const WARM_UP_SECONDS = 120;
     const penaltyState = { active: false, side: null, clock: 60, running: false, lastSide: null, afterCompleteAction: null };
     const state = {
@@ -1304,6 +1318,7 @@
       penaltyTimer = null;
       breakTimer = null;
       pendingNextEnd = null;
+      pendingTieBreak = null;
       state.mode = config.mode;
       state.competitionFormat = config.competitionFormat;
       state.endSeconds = config.seconds;
@@ -1731,9 +1746,11 @@
       if (!guardCurrentRegularEndScore()) return;
       recordEnd();
       upsertEndReport(state.currentEnd);
-      if (state.currentEnd < state.totalEnds) {
-        startBreak(Number(state.currentEnd) + 1);
-      } else if (state.red.score === state.blue.score) {
+      const next = window.MsbBreakFlow.afterRegularEnd({ currentEnd: state.currentEnd, totalEnds: state.totalEnds,
+        redScore: state.red.score, blueScore: state.blue.score });
+      if (next.type === "break") {
+        startBreak(next.nextEnd);
+      } else if (next.type === "chooseTieBreakStarter") {
         state.tieBreak.required = true;
         toggleModal("tie-modal", true);
       } else {
@@ -1742,7 +1759,8 @@
     }
 
     function continueTieBreakFlow() {
-      if (state.tieBreak.score.red === state.tieBreak.score.blue) {
+      const next = window.MsbBreakFlow.afterTieBreakEnd(state.tieBreak.score);
+      if (next.type === "chooseTieBreakStarter") {
         state.tieBreak.winner = null;
         upsertEndReport(currentEndKey());
         state.tieBreak.count = nextTieBreakCount(state.tieBreak.count);
@@ -1761,7 +1779,7 @@
         updateDisplay();
         return;
       }
-      state.tieBreak.winner = state.tieBreak.score.red > state.tieBreak.score.blue ? "red" : "blue";
+      state.tieBreak.winner = next.winner;
       upsertEndReport(currentEndKey());
       endMatch();
     }
@@ -2220,8 +2238,9 @@
     function startBreak(nextEndNumber) {
       pauseTimer();
       pendingNextEnd = nextEndNumber;
+      pendingTieBreak = null;
       breakTimeLeft = 60;
-      document.getElementById("break-info").textContent = `準備第 ${nextEndNumber} 局`;
+      document.getElementById("break-info").textContent = window.MsbBreakFlow.regularBreakLabel(nextEndNumber);
       document.getElementById("break-clock").textContent = String(breakTimeLeft);
       document.getElementById("break-start-btn").textContent = "倒數";
       if (breakTimer) clearInterval(breakTimer);
@@ -2239,14 +2258,41 @@
       breakTimer = setInterval(() => {
         breakTimeLeft = Math.max(0, breakTimeLeft - 1);
         document.getElementById("break-clock").textContent = String(breakTimeLeft);
+        if (pendingTieBreak) {
+          pendingTieBreak.breakTimeLeft = breakTimeLeft;
+          saveLocalProgress();
+        }
         if (breakTimeLeft <= 0) finishBreak();
       }, 1000);
+    }
+
+    // A tie-break break shares the modal and buttons with the regular break but only starts the
+    // tie-break end afterwards: currentEnd, TB state, scores and the chosen starter stay untouched.
+    function showTieBreakBreak(pending, { restoring = false } = {}) {
+      if (!restoring) pauseTimer();
+      pendingNextEnd = null;
+      pendingTieBreak = { starter: pending.starter, count: pending.count, breakTimeLeft: pending.breakTimeLeft };
+      breakTimeLeft = pending.breakTimeLeft;
+      document.getElementById("break-info").textContent = window.MsbBreakFlow.tieBreakBreakLabel(pending.count);
+      document.getElementById("break-clock").textContent = String(breakTimeLeft);
+      document.getElementById("break-start-btn").textContent = "倒數";
+      if (breakTimer) clearInterval(breakTimer);
+      breakTimer = null;
+      toggleModal("break-modal", true);
+      if (!restoring) saveLocalProgress();
     }
 
     function finishBreak() {
       if (breakTimer) clearInterval(breakTimer);
       breakTimer = null;
-      if (pendingNextEnd != null) {
+      const action = window.MsbBreakFlow.finishBreakAction({ pendingNextEnd, pendingTieBreak });
+      if (action.type === "startTieBreak") {
+        pendingTieBreak = null;
+        toggleModal("break-modal", false);
+        beginTieBreak(action.starter);
+        return;
+      }
+      if (action.type === "regularEnd") {
         state.currentEnd = pendingNextEnd;
         pendingNextEnd = null;
         resetCurrentEnd(true);
@@ -2403,7 +2449,15 @@
       penaltyState.afterCompleteAction = null;
     }
 
+    // Starter chosen in tie-modal: every tie-break end is preceded by the 60-second break.
     function startTieBreak(starter) {
+      const pending = window.MsbBreakFlow.pendingTieBreak(state.tieBreak, starter);
+      if (!pending) return;
+      toggleModal("tie-modal", false);
+      showTieBreakBreak(pending);
+    }
+
+    function beginTieBreak(starter) {
       const isFirstTieBreak = !state.tieBreak.active;
       state.tieBreak.active = true;
       if (isFirstTieBreak) state.tieBreak.count = nextTieBreakCount(state.tieBreak.count);
@@ -2916,6 +2970,7 @@
           penaltyHistory: state.penaltyHistory,
           violations: state.violations,
           tieBreak: state.tieBreak,
+          pendingTieBreak,
           matchApproval: state.matchApproval,
           jackOwnerOverride: state.jackOwnerOverride,
           firstPenaltySide: state.firstPenaltySide,
@@ -3003,6 +3058,10 @@
       state.localReport = progress.localReport || null;
       state.localResultSummary = progress.localResultSummary || null;
       pausedSide = null;
+      pendingTieBreak = null;
+      const restore = window.MsbBreakFlow.restoreAction(progress);
+      if (restore.type === "tieBreakBreak") showTieBreakBreak(restore, { restoring: true });
+      else if (restore.type === "chooseTieBreakStarter") toggleModal("tie-modal", true);
       return true;
     }
 
