@@ -114,6 +114,11 @@
         .balls-row { gap: .3rem; padding: .35rem; }
         .ball { width: 22px; height: 22px; }
       }
+      /* 中間欄變窄後，「第 2 局」「團體賽」不換行：字級依中間卡片寬度縮放。 */
+      .center-card { container: center-card / inline-size; }
+      #center-mode, #center-end-display { white-space: nowrap; line-height: 1.1; }
+      #center-mode { font-size: min(3.75rem, 30cqw); }
+      #center-end-display { font-size: min(3.75rem, 30cqw); }
     }
     /* Break, penalty and tie-break modals: readable from the side of the court, sized by the viewport. */
     .big-modal-panel { padding: clamp(1.25rem, 4vmin, 2.5rem); }
